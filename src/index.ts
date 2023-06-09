@@ -1,3 +1,4 @@
+#!/usr/bin/env node
 import {readFile, parseToml, execScript, stringifyObj, writeFile, deleteDep} from "./lib/utils";
 import {getLatestVersion, getImmedteDep, getNestedDep, getTarballLinkAndName} from "./lib/api";
 import { JsonMap } from "@iarna/toml";
@@ -61,9 +62,11 @@ const main = async () => {
         deleteDep(obj, process.argv.slice(3));
       }
     } else console.error("🥝 Invalid operation");
-  } catch (error) {
-    console.log("🍈 An Error Occured, please open an issue on the Chef Github Repo.");
-    console.log(error);
+  } catch (error: any) {
+    console.log("🍈 An Error Occured, please open an issue with the ./log.txt file on the Chef Github Repo.");
+    error+='\n';
+    if(fs.existsSync("./log.txt")) fs.appendFileSync("./log.txt", error);
+    else writeFile("./log.txt", error);
   }
 };
 
@@ -82,7 +85,7 @@ const install = async (depenecyMap: JsonMap, v: boolean) => {
       dependecy_graph[cli_dep][immed_dep] = immediteDep[immed_dep];
       const nestedDep = await getNestedDep(immed_dep, immediteDep[immed_dep] as string);
       for (let nested_dep in nestedDep) {
-        if(v) console.log(`   ➡️ nested dependency: ${nested_dep}`); 
+        if(v) console.log(`   ➡️ nested dependency: ${nested_dep}`);
         dependecy_graph[cli_dep][nested_dep] = nestedDep[nested_dep];
       }
     }

@@ -1,3 +1,4 @@
+#!/usr/bin/env node
 import * as fs from "fs";
 import { JsonMap, parse, stringify } from "@iarna/toml";
 import { parse as urlParser } from "url";

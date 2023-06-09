@@ -1,3 +1,4 @@
+#!/usr/bin/env node
 import axios from "axios";
 import * as fs from "fs";
 import * as https from "https";
@@ -90,14 +91,22 @@ const getVersion = async (dependency: string, version: string): Promise<string> 
     const ver = await getLatestVersion(dependency);
     return ver[1];
   } else {
-    return version
-      .replaceAll("~", "")
-      .replaceAll("^", "")
-      .replaceAll("*", "")
-      .replaceAll(">", "")
-      .replaceAll("=", "")
-      .replaceAll("^", "")
-      .replaceAll("<", "")
-      .trim();
+    let tr = version
+    .replaceAll("~", "")
+    .replaceAll("^", "")
+    .replaceAll("*", "")
+    .replaceAll(">", "")
+    .replaceAll("=", "")
+    .replaceAll("^", "")
+    .replaceAll("<", "")
+    .trim();
+    if(tr.split(".").length!=3){
+      // let tra = tr.split(".");
+      // for(let i=0; i<=3-tra.length; i++) tra.push(0);
+      // tr = tra.join(".");
+      const ver = await getLatestVersion(dependency);
+      tr = ver[1];
+    }
+    return tr;
   }
 };

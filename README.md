@@ -1,16 +1,40 @@
 # Chef 👨‍🍳
-- The Chef Package Manager is a new way of adding javascript dependencies and avoid the version resolution hell.
-- Chef is a Beginner Friendly PM and offers a much smarter 🔎 and cuter 😍 approach to everything.
-- Chef is under heavy development, have a look at the current [todo list](./docs/TODO.md).
-- The Specifications for Chef can be found [here](./docs/SPECS.md).
+- Chef is a Beginner Friendly PM and offers a much smarter 🔎 and cuter 😳 approach to everything.
+- Chef is still well under development, and if you would like to contribute please see the issue tab.
 
 ---
 
 ## Usage
-- `npm install` dependencies for chef to work
-- `npm run build` to build chef
-- then to run chef do `npm run chef`
-    - until chef becomes a bit more stable and robust, we won't be putting this on NPM, so a global chef command is not gonna be worked on as of now
-    - TIP: alias chef as `npm run chef` and add it to your path if you want
-- `npm run chef add <pName>` etc. (see [specs](./docs/SPECS.md) for more info on usage)
-- `node ./build/index.js add <pName> --verbose` to use the verbose flag since npm captures it if launched with npm.
+- `chef init`
+  - Initializes your project to work with chef!
+- `chef add <pName>` : Implemented
+  - add a package to your amazing recipe!
+- `chef taste <pName>`
+  - check if a package is dependency or direct conflict with the current packages
+- `chef recommend <description as String>`
+  - context search! Recommend packages on basis of the given description keywords
+- `chef remove <pName>` : Implemented
+  - uninstall a package
+- `chef search <pName>`
+  - search for a package name on the registry
+- `chef serve <scriptName>` : Implemented
+  - runs a particular script specified in the chef.toml file
+
+---
+
+## Installation
+- To install the chef package manager (chef-pm), use the following command:
+  - `npm install -g chef-pm`
+  - note the -g flag, it is for globally installing chef, so that he never leaves your side! 😋
+- iwr/curl
+  - not available yet
+- Manual install
+  - Please see the [build](#build) section.
+
+---
+
+## Build
+- `npm install`: To install all dependencies 🍰
+- `npm run build`: To build Typescript files 😋
+- `npm link`: To Install Chef as local executable 😲
+- `chef`: To verify integrity of installation 💖

@@ -1,7 +1,8 @@
 {
-  "name": "chef_pm",
-  "version": "1.0.0",
+  "name": "chef-pm",
+  "version": "1.0.2",
   "scripts": {
+    "install": "npm install -g chef-pm",
     "build": "npm install && npx tsc",
     "chef": "node ./build/index.js"
   },
@@ -9,6 +10,9 @@
   "main": "",
   "author": "",
   "license": "",
+  "bin": {
+    "chef": "./build/index.js"
+  },
   "dependencies": {
     "@iarna/toml": "^2.2.5",
     "@types/decompress": "^4.2.4",
