@@ -45,7 +45,12 @@ export const unZip = async (module_location: string, newWrite: string) => {
     .then((_files) => {
       //delete the tarball
       removeSync(module_location);
-      moveFolder(`${newWrite}/package`, newWrite);
+      if(fs.existsSync(`${newWrite}/package`)) moveFolder(`${newWrite}/package`, newWrite);
+      else {
+        const t = newWrite.split("/");
+        const item = t[t.length-1];
+        moveFolder(`${newWrite}/${item}`, newWrite);
+      }
     })
     .catch((err) => {
       if (err) console.log(err);
@@ -55,10 +60,12 @@ export const unZip = async (module_location: string, newWrite: string) => {
 const moveFolder = (src: string, des: string): void => {
   try {
     copySync(src, des);
-    //delete everything on the package folder
     removeSync(src);
   } catch (e) {
-    console.log("🥺 Error");
+    console.log("🍈 An Error Occured, please open an issue on the Chef Github Repo.");
+    console.log(e);
+    // MASSIVE TODO: rollback current transaction and mark as uninstalled on all errors occured during install
+    // implement status exit codes in all functions for that
   }
 };
 
