@@ -1,0 +1,25 @@
+{
+  "name": "Chef 🧑‍🍳",
+  "version": "1.0.0",
+  "scripts": {
+    "build": "npm install && npx tsc",
+    "chef": "node ./build/index.js"
+  },
+  "description": "Chef!",
+  "main": "",
+  "author": "",
+  "license": "",
+  "dependencies": {
+    "@iarna/toml": "^2.2.5",
+    "@types/decompress": "^4.2.4",
+    "@types/fs-extra": "^9.0.13",
+    "axios": "^0.27.2",
+    "decompress": "^4.2.1",
+    "fs-extra": "^10.1.0",
+    "ts-node": "^10.9.1"
+  },
+  "devDependencies": {
+    "@types/node": "^17.0.31",
+    "typescript": "^4.6.4"
+  }
+}

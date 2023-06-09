@@ -1,4 +1,6 @@
 # Specification -
+- `chef init`
+    - initializes your project to work with chef!
 - `chef add <pName>`
     - add a package to your amazing recipe!
 - `chef taste <pName>`
@@ -10,4 +12,4 @@
 - `chef search <pName>`
     - search for a package name on the registry
 - `chef serve <scriptName>`
-    - runs a particular script specified in the package.json file
+    - runs a particular script specified in the chef.toml file
