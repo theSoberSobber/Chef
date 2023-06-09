@@ -13,3 +13,4 @@
     - until chef becomes a bit more stable and robust, we won't be putting this on NPM, so a global chef command is not gonna be worked on as of now
     - TIP: alias chef as `npm run chef` and add it to your path if you want
 - `npm run chef add <pName>` etc. (see [specs](./docs/SPECS.md) for more info on usage)
+- `node ./build/index.js add <pName> --verbose` to use the verbose flag since npm captures it if launched with npm.

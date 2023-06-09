@@ -51,21 +51,21 @@ export const getNestedDep = async (dependecy: string, version: string): Promise<
   }
 };
 
-export const getTarballLinkAndName = async (dependecy: string, version: string) => {
+export const getTarballLinkAndName = async (dependecy: string, version: string, v: boolean) => {
   try {
-    console.log(` ➡️ Downloading: ${dependecy}`);
+    if(v) console.log(` ➡️ Downloading: ${dependecy}`);
     const { data } = await axios.get(`${base_url}/${dependecy}/${await getVersion(dependecy, version)}`);
     const download_link = data["dist"]["tarball"];
     const name = data["name"];
-    await downloadAndunZip([download_link, name]);
+    await downloadAndunZip([download_link, name], v);
   } catch (err) {
     console.error(err);
   }
 };
 
-const downloadAndunZip = async (link: string[]) => {
+const downloadAndunZip = async (link: string[], v: boolean) => {
   try {
-    console.log(`   ➡️ Extracting: ${link[1]}`);
+    if(v) console.log(`   ➡️ Extracting: ${link[1]}`);
     if (!fs.existsSync(`./${dir_name}`)) fs.mkdirSync(`${dir_name}`);
     const fileName = getFileName(link[0]);
 
