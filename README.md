@@ -1,8 +1,8 @@
 # Chef 👨‍🍳
-The Chef Package Manager is a new way of adding javascript dependencies and avoid the version resolution hell. <br />
-Chef is made a Beginner Friendly PM and offers a much smarter (context search) and cuter 😍 approach to everything. <br />
-Chef is under heavy development, have a look at the current [todo list](./docs/TODO.md). <br />
-The Specifications for Chef can be found [here](./docs/SPECS.md).
+- The Chef Package Manager is a new way of adding javascript dependencies and avoid the version resolution hell.
+- Chef is a Beginner Friendly PM and offers a much smarter 🔎 and cuter 😍 approach to everything.
+- Chef is under heavy development, have a look at the current [todo list](./docs/TODO.md).
+- The Specifications for Chef can be found [here](./docs/SPECS.md).
 
 ---
 

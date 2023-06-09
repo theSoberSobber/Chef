@@ -1,4 +1,4 @@
-# Specification -
+# Specifications
 - `chef init`
     - initializes your project to work with chef!
 - `chef add <pName>`
