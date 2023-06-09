@@ -6,12 +6,12 @@ import * as fs from "fs";
 const main = async () => {
   try {
     const obj = parseToml(await readFile("./chef.toml"));
-    let chefTomlMode: boolean = fs.existsSync(`./chef.lock.toml`);
     let v: boolean = false; 
     for(let i: number = 0; i<process.argv.length; i++)  if(process.argv[i]=="--verbose" || process.argv[i]=="-v"){
       v=true;
       process.argv.splice(i, 1);
     }
+    // add
     if (process.argv[2] === "add") {
       if (process.argv.length == 3) {
         const dependency_list = obj["dependencies"] as object;
@@ -22,10 +22,10 @@ const main = async () => {
         let cmd_map: JsonMap = {};
         const dependecy_list = process.argv.slice(3);
         const latest_list = [];
-        let objLock: object;
-        if(chefTomlMode) objLock = await parseToml(await readFile("./chef.lock.toml"));
+        let objLock: (string | undefined | object) = undefined;
+        if(fs.existsSync("./chef.lock.toml")) objLock = await parseToml(await readFile("./chef.lock.toml"));
         for (let i of dependecy_list){
-          if(chefTomlMode && objLock[i]!=undefined) console.log(`😋 Requirement ${i} already satisfied. Skipping...`);
+          if(objLock!=undefined && objLock[i]!=undefined) console.log(`😋 Requirement ${i} already satisfied. Skipping...`);
           else latest_list.push(getLatestVersion(i));
         }
         const resolved_list = await Promise.all(latest_list);
@@ -35,7 +35,7 @@ const main = async () => {
         let toml_str = stringifyObj(obj);
         writeFile("./chef.toml", toml_str);
       }
-    } else if (process.argv[2] === "serve") {
+    }else if (process.argv[2] === "serve") {
       if (process.argv.length < 4) {
         console.error("Invalid serve arguments supplied.");
       } else {
@@ -95,7 +95,7 @@ const install = async (depenecyMap: JsonMap, v: boolean) => {
     let toml_str = stringifyObj({ ...dependecy_graph, ...obj });
     writeFile("./chef.lock.toml", toml_str);
   }
-  let dependency_cnt=0;
+  let dependency_cnt: number = 0;
   for(let i in dependecy_graph) dependency_cnt+=(Object.keys(dependecy_graph[i]).length-1); 
   console.log(`🍒 Successfuly added ${Object.keys(depenecyMap).length} package(s) and ${dependency_cnt} dependency(s).`);
   if(!v) console.log("🍌 Specify --verbose or -v to get more detailed info on install.");
