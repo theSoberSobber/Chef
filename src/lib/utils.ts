@@ -77,7 +77,7 @@ export const execScript = (command: string): void => {
   child.on("close", (code) => {
     if (code !== 0) {
       console.log(`🍴 Error!`);
-      console.log(`Exited with status ${code}`);
+      console.log(`🍎 Exited with status ${code}`);
     }
   });
 };
@@ -99,23 +99,22 @@ export const deleteDep = async (payload: JsonMap, delete_item: string[]) => {
         console.log(`🗡️ Deleted ${item}`);
       }
       //update config file
-      const toml_data = await readFile("./chef.toml");
-      const obj = parseToml(toml_data);
-      if (obj["dependencies"][item]) {
-        delete obj["dependencies"][item];
-      } else {
-        delete obj["devDependncies"][item];
+      if(fs.existsSync("./chef.toml")){
+        const toml_data = await readFile("./chef.toml");
+        const obj = parseToml(toml_data);
+        if (obj["dependencies"][item]) {
+          delete obj["dependencies"][item];
+        } else {
+          delete obj["devDependncies"][item];
+        }
+
+        let toml_config_str = stringifyObj(obj);
+        writeFile("./chef.toml", toml_config_str); 
       }
-
-      let toml_config_str = stringifyObj(obj);
-      writeFile("./chef.toml", toml_config_str);
-
       //update the lock file
       let toml_str = stringifyObj(payload);
       writeFile("./chef.lock.toml", toml_str);
-    } else {
-      console.error(`parent dependecy ${item} not found`);
-    }
+    } else console.error(`🗡️ Package ${item} not found.`);
   }
   // console.log(payload, delete_item);
 };

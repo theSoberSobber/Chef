@@ -5,19 +5,28 @@ import * as fs from "fs";
 
 const main = async () => {
   try {
-    const obj = parseToml(await readFile("./chef.toml"));
+    let obj: (Object | undefined) = undefined;
+    if(fs.existsSync("./chef.toml")) obj = parseToml(await readFile("./chef.toml"));
     let v: boolean = false; 
-    for(let i: number = 0; i<process.argv.length; i++)  if(process.argv[i]=="--verbose" || process.argv[i]=="-v"){
-      v=true;
-      process.argv.splice(i, 1);
+    for(let i: number = 0; i<process.argv.length; i++){
+      if(process.argv[i]=="--verbose" || process.argv[i]=="-v"){
+        v=true;
+        process.argv.splice(i, 1);
+      }
+      if(process.argv[i]=="--global" || process.argv[i]=="-g"){
+        console.log(`🔪 Global Installs are currently not supported.`);
+        return;
+      }
     }
     // add
     if (process.argv[2] === "add") {
       if (process.argv.length == 3) {
-        const dependency_list = obj["dependencies"] as object;
-        const dev_dependency_list = obj["devDependncies"] as object;
-        const all_dependencies = { ...dependency_list, ...dev_dependency_list };
-        install(all_dependencies, v);
+        if(obj!=undefined){
+          const dependency_list = obj["dependencies"] as object;
+          const dev_dependency_list = obj["devDependncies"] as object;
+          const all_dependencies = { ...dependency_list, ...dev_dependency_list };
+          install(all_dependencies, v);
+        } else console.log(`🔪 No Valid chef.toml found, Exiting...`);
       } else {
         let cmd_map: JsonMap = {};
         const dependecy_list = process.argv.slice(3);
@@ -31,9 +40,11 @@ const main = async () => {
         const resolved_list = await Promise.all(latest_list);
         for (let item of resolved_list) cmd_map[item[0]] = item[1];
         await install(cmd_map, v);
-        for (let dep in cmd_map) obj["dependencies"][dep] = cmd_map[dep];
-        let toml_str = stringifyObj(obj);
-        writeFile("./chef.toml", toml_str);
+        if(obj!=undefined){
+          for (let dep in cmd_map) obj["dependencies"][dep] = cmd_map[dep];
+          let toml_str = stringifyObj(obj);
+          writeFile("./chef.toml", toml_str);
+        }
       }
     }else if (process.argv[2] === "serve") {
       if (process.argv.length < 4) {

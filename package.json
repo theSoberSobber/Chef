@@ -1,5 +1,5 @@
 {
-  "name": "Chef 🧑‍🍳",
+  "name": "chef_pm",
   "version": "1.0.0",
   "scripts": {
     "build": "npm install && npx tsc",
