@@ -6,7 +6,12 @@ import * as fs from "fs";
 const main = async () => {
   try {
     const obj = parseToml(await readFile("./chef.toml"));
-    let v: boolean = false; for(let ar of process.argv) if(ar=="--verbose" || ar=="-v") v=true;
+    let chefTomlMode: boolean = fs.existsSync(`./chef.lock.toml`);
+    let v: boolean = false; 
+    for(let i: number = 0; i<process.argv.length; i++)  if(process.argv[i]=="--verbose" || process.argv[i]=="-v"){
+      v=true;
+      process.argv.splice(i, 1);
+    }
     if (process.argv[2] === "add") {
       if (process.argv.length == 3) {
         const dependency_list = obj["dependencies"] as object;
@@ -17,9 +22,11 @@ const main = async () => {
         let cmd_map: JsonMap = {};
         const dependecy_list = process.argv.slice(3);
         const latest_list = [];
+        let objLock: object;
+        if(chefTomlMode) objLock = await parseToml(await readFile("./chef.lock.toml"));
         for (let i of dependecy_list){
-          if(i=="--verbose" || i=="-v") continue;
-          latest_list.push(getLatestVersion(i));
+          if(chefTomlMode && objLock[i]!=undefined) console.log(`😋 Requirement ${i} already satisfied. Skipping...`);
+          else latest_list.push(getLatestVersion(i));
         }
         const resolved_list = await Promise.all(latest_list);
         for (let item of resolved_list) cmd_map[item[0]] = item[1];
