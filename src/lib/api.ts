@@ -91,22 +91,19 @@ const getVersion = async (dependency: string, version: string): Promise<string> 
     const ver = await getLatestVersion(dependency);
     return ver[1];
   } else {
-    let tr = version
-    .replaceAll("~", "")
-    .replaceAll("^", "")
-    .replaceAll("*", "")
-    .replaceAll(">", "")
-    .replaceAll("=", "")
-    .replaceAll("^", "")
-    .replaceAll("<", "")
-    .trim();
-    if(tr.split(".").length!=3){
-      // let tra = tr.split(".");
-      // for(let i=0; i<=3-tra.length; i++) tra.push(0);
-      // tr = tra.join(".");
-      const ver = await getLatestVersion(dependency);
-      tr = ver[1];
-    }
+    // doesn't handle ">= 2.1.2 < 3"
+    // let tr = version
+    // .replaceAll("~", "")
+    // .replaceAll("^", "")
+    // .replaceAll("*", "")
+    // .replaceAll(">", "")
+    // .replaceAll("=", "")
+    // .replaceAll("^", "")
+    // .replaceAll("<", "")
+    // .trim();
+    const pattern = /\b(\d+)\.(\d+)\.(\d+)\b/g;
+    const matches = version.match(pattern);
+    let tr = matches[0];
     return tr;
   }
 };

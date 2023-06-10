@@ -1,18 +1,25 @@
 {
   "name": "chef-pm",
-  "version": "1.0.2",
+  "version": "1.0.4",
   "scripts": {
     "install": "npm install -g chef-pm",
     "build": "npm install && npx tsc",
     "chef": "node ./build/index.js"
   },
   "description": "Chef!",
-  "main": "",
-  "author": "",
-  "license": "",
+  "main": "index.js",
+  "author": "mesosan",
+  "year": "2023",
+  "license": "MIT",
   "bin": {
     "chef": "./build/index.js"
   },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/theSoberSobber/Chef.git"
+  },
+  "homepage": "https://theSoberSobber.github.io/Chef/",
+  "keywords": ["PackageManager", "Package", "Manager", "ChefPM", "Chef", "npm", "pnpm", "yarn", "minimal"],
   "dependencies": {
     "@iarna/toml": "^2.2.5",
     "@types/decompress": "^4.2.4",
