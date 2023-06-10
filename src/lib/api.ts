@@ -2,7 +2,8 @@
 import axios from "axios";
 import * as fs from "fs";
 import * as https from "https";
-import { getFileName, unZip } from "./utils";
+import { getFileName, unZip, log } from "./utils";
+import { JsonMap } from "@iarna/toml";
 
 export const dir_name = "node_modules";
 const base_url = "https://registry.npmjs.org";
@@ -20,9 +21,7 @@ export const getLatestVersion = async (dependecy: string): Promise<string[]> => 
 //get dependecies and dev dependencies of packages in our toml config
 export const getImmedteDep = async (dependecy: string, version: string): Promise<{}> => {
   try {
-    const { data } = await axios.get(
-      `${base_url}/${dependecy}/${await getVersion(dependecy, version)}`
-    );
+    const { data } = await axios.get(`${base_url}/${dependecy}/${await getVersion(dependecy, version)}`);
     //get immediate dependencies of the dependency
     const related_dep = data["dependencies"];
     return related_dep;
@@ -34,7 +33,7 @@ export const getImmedteDep = async (dependecy: string, version: string): Promise
 export const getNestedDep = async (dependecy: string, version: string): Promise<{}> => {
   try {
     const { data } = await axios.get(`${base_url}/${dependecy}/${await getVersion(dependecy, version)}`);
-    let all_dependecies = {};
+    let all_dependecies: JsonMap = {};
     const related_dep = data["dependencies"];
     const all_related_dep = { ...related_dep };
     //if there are nested dependecies, recursively call the function
@@ -42,13 +41,14 @@ export const getNestedDep = async (dependecy: string, version: string): Promise<
       //append to the dep map
       for (let item in all_related_dep) {
         all_dependecies[item] = all_related_dep[item];
-        let v= await getNestedDep(item, all_related_dep[item] as string)
+        let v: JsonMap = await getNestedDep(item, all_related_dep[item] as string)
         for(let a in v) all_dependecies[a] = v[a];
       }
     }
     return all_dependecies;
   } catch (err) {
     console.error(err);
+    return 1;
   }
 };
 
@@ -94,10 +94,9 @@ const getVersion = async (dependency: string, version: string): Promise<string> 
   } else {
     if(version.split(".").length==3){
       const pattern = /\b(\d+)\.(\d+)\.(\d+)\b/g;
-      const matches = version.match(pattern);
+      const matches = version.match(pattern)!;
       return matches[0];
     } else {
-      // "~2" type
       const ver = await getLatestVersion(dependency);
       return ver[1];
     }

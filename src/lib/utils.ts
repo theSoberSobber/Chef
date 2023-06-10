@@ -31,6 +31,11 @@ export const stringifyObj = (payload: JsonMap): string => {
   return str;
 };
 
+export const log = (message: string): void => {
+  console.error(message);
+  return;
+};
+
 export const parseToml = (payload: string): JsonMap => {
   const obj = parse(payload);
   return obj;
@@ -38,7 +43,7 @@ export const parseToml = (payload: string): JsonMap => {
 
 export const getFileName = (path: string): string => {
   var parsed = urlParser(path);
-  return basename(parsed.pathname);
+  return basename(parsed.pathname as string);
 };
 
 export const unZip = async (module_location: string, newWrite: string) => {
@@ -98,7 +103,7 @@ export const deleteDep = async (payload: JsonMap, delete_item: string[]) => {
       let check = false;
       //check if a dependecy sub dependecy relies on this
       for (let sub_dep in payload) {
-        if (payload[sub_dep][item]) {
+        if ((payload[sub_dep] as JsonMap)[item]) {
           check = true;
         }
       }
@@ -110,10 +115,10 @@ export const deleteDep = async (payload: JsonMap, delete_item: string[]) => {
       if(fs.existsSync("./chef.toml")){
         const toml_data = await readFile("./chef.toml");
         const obj = parseToml(toml_data);
-        if (obj["dependencies"][item]) {
-          delete obj["dependencies"][item];
+        if ((obj["dependencies"] as JsonMap)[item]) {
+          delete (obj["dependencies"] as JsonMap)[item];
         } else {
-          delete obj["devDependncies"][item];
+          delete (obj["devDependncies"] as JsonMap)[item];
         }
 
         let toml_config_str = stringifyObj(obj);

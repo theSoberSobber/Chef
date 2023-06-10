@@ -1,6 +1,6 @@
 {
   "name": "chef-pm",
-  "version": "1.0.5",
+  "version": "1.0.6",
   "scripts": {
     "install": "npm install -g chef-pm",
     "build": "npm install && npx tsc",

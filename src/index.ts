@@ -1,5 +1,5 @@
 #!/usr/bin/env node
-import {readFile, parseToml, execScript, stringifyObj, writeFile, deleteDep} from "./lib/utils";
+import {readFile, parseToml, execScript, stringifyObj, writeFile, deleteDep, log} from "./lib/utils";
 import {getLatestVersion, getImmedteDep, getNestedDep, getTarballLinkAndName} from "./lib/api";
 import { JsonMap } from "@iarna/toml";
 import * as fs from "fs";
@@ -8,7 +8,7 @@ const base_url = "https://registry.npmjs.org";
 
 const main = async () => {
   try {
-    let obj: (Object | undefined) = undefined;
+    let obj: (JsonMap | undefined) = undefined;
     if(fs.existsSync("./chef.toml")) obj = parseToml(await readFile("./chef.toml"));
     let v: boolean = false; 
     for(let i: number = 0; i<process.argv.length; i++){
@@ -16,10 +16,7 @@ const main = async () => {
         v=true;
         process.argv.splice(i, 1);
       }
-      if(process.argv[i]=="--global" || process.argv[i]=="-g"){
-        console.log(`🔪 Global Installs are currently not supported.`);
-        return;
-      }
+      if(process.argv[i]=="--global" || process.argv[i]=="-g") return log(`🔪 Global Installs are currently not supported.`);
     }
     // add
     if (process.argv[2] === "add") {
@@ -29,12 +26,12 @@ const main = async () => {
           const dev_dependency_list = obj["devDependncies"] as object;
           const all_dependencies = { ...dependency_list, ...dev_dependency_list };
           install(all_dependencies, v);
-        } else console.log(`🔪 No Valid chef.toml found, Exiting...`);
+        } else return log(`🔪 No Valid chef.toml found, Exiting...`);
       } else {
         let cmd_map: JsonMap = {};
         const dependecy_list = process.argv.slice(3);
         const latest_list = [];
-        let objLock: (string | undefined | object) = undefined;
+        let objLock: (string | undefined | JsonMap) = undefined;
         if(fs.existsSync("./chef.lock.toml")) objLock = await parseToml(await readFile("./chef.lock.toml"));
         for (let i of dependecy_list){
           i=i.toLowerCase();
@@ -45,7 +42,7 @@ const main = async () => {
         for (let item of resolved_list) cmd_map[item[0]] = item[1];
         await install(cmd_map, v);
         if(obj!=undefined){
-          for (let dep in cmd_map) obj["dependencies"][dep] = cmd_map[dep];
+          for (let dep in cmd_map) (obj["dependencies"] as JsonMap)[dep] = cmd_map[dep];
           let toml_str = stringifyObj(obj);
           writeFile("./chef.toml", toml_str);
         }
@@ -54,8 +51,9 @@ const main = async () => {
       if (process.argv.length < 4) {
         console.error("Invalid serve arguments supplied.");
       } else {
-        const script = obj["scripts"];
-        if(script[process.argv[3]]) execScript(script[process.argv[3]]);
+        if(obj===undefined) return log(`🔪 No Valid chef.toml found, Exiting...`);
+        const script = obj["scripts"] as JsonMap;
+        if(script[process.argv[3]]) execScript(script[process.argv[3]] as string);
         else console.log(`🗡️ Error! No such script found`);
       }
     } else if (process.argv[2] === "remove") {
@@ -66,12 +64,12 @@ const main = async () => {
       }
     } else console.error("🥝 Invalid operation");
   } catch (error: any) {
-    if(error.response.status=="404") console.log(`🔪 Package name not found on ${base_url}. (${error.response.status})`);
+    if(error.response.status=="404") return log(`🔪 Package name not found on ${base_url}. (${error.response.status})`);
     else {
-      console.log("🍈 An Error Occured, please open an issue with the ./log.txt file on the Chef Github Repo.");
       error+='\n';
       if(fs.existsSync("./log.txt")) fs.appendFileSync("./log.txt", error);
       else writeFile("./log.txt", error);
+      return log("🍈 An Error Occured, please open an issue with the ./log.txt file on the Chef Github Repo.");
     }
   }
 };
@@ -83,16 +81,16 @@ const install = async (depenecyMap: JsonMap, v: boolean) => {
     if(v) console.log(`🍉 Resolving nested Dependencies for ${cli_dep}`);
 
     dependecy_graph[cli_dep] = {};
-    dependecy_graph[cli_dep][cli_dep] = depenecyMap[cli_dep];
+    (dependecy_graph[cli_dep] as JsonMap)[cli_dep] = depenecyMap[cli_dep];
 
-    const immediteDep = await getImmedteDep(cli_dep, depenecyMap[cli_dep] as string);
+    const immediteDep: JsonMap = await getImmedteDep(cli_dep, depenecyMap[cli_dep] as string);
     for (let immed_dep in immediteDep) {
       if(v) console.log(` ➡️ immediate dependency: ${immed_dep}`);
-      dependecy_graph[cli_dep][immed_dep] = immediteDep[immed_dep];
-      const nestedDep = await getNestedDep(immed_dep, immediteDep[immed_dep] as string);
+      (dependecy_graph[cli_dep] as JsonMap)[immed_dep] = immediteDep[immed_dep];
+      const nestedDep: JsonMap = await getNestedDep(immed_dep, immediteDep[immed_dep] as string);
       for (let nested_dep in nestedDep) {
         if(v) console.log(`   ➡️ nested dependency: ${nested_dep}`);
-        dependecy_graph[cli_dep][nested_dep] = nestedDep[nested_dep];
+        (dependecy_graph[cli_dep] as JsonMap)[nested_dep] = nestedDep[nested_dep];
       }
     }
   }
