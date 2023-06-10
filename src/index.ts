@@ -4,6 +4,8 @@ import {getLatestVersion, getImmedteDep, getNestedDep, getTarballLinkAndName} fr
 import { JsonMap } from "@iarna/toml";
 import * as fs from "fs";
 
+const base_url = "https://registry.npmjs.org";
+
 const main = async () => {
   try {
     let obj: (Object | undefined) = undefined;
@@ -35,6 +37,7 @@ const main = async () => {
         let objLock: (string | undefined | object) = undefined;
         if(fs.existsSync("./chef.lock.toml")) objLock = await parseToml(await readFile("./chef.lock.toml"));
         for (let i of dependecy_list){
+          i=i.toLowerCase();
           if(objLock!=undefined && objLock[i]!=undefined) console.log(`😋 Requirement ${i} already satisfied. Skipping...`);
           else latest_list.push(getLatestVersion(i));
         }
@@ -63,10 +66,13 @@ const main = async () => {
       }
     } else console.error("🥝 Invalid operation");
   } catch (error: any) {
-    console.log("🍈 An Error Occured, please open an issue with the ./log.txt file on the Chef Github Repo.");
-    error+='\n';
-    if(fs.existsSync("./log.txt")) fs.appendFileSync("./log.txt", error);
-    else writeFile("./log.txt", error);
+    if(error.response.status=="404") console.log(`🔪 Package name not found on ${base_url}. (${error.response.status})`);
+    else {
+      console.log("🍈 An Error Occured, please open an issue with the ./log.txt file on the Chef Github Repo.");
+      error+='\n';
+      if(fs.existsSync("./log.txt")) fs.appendFileSync("./log.txt", error);
+      else writeFile("./log.txt", error);
+    }
   }
 };
 

@@ -54,7 +54,7 @@ export const getNestedDep = async (dependecy: string, version: string): Promise<
 
 export const getTarballLinkAndName = async (dependecy: string, version: string, v: boolean) => {
   try {
-    if(v) console.log(` ➡️ Downloading: ${dependecy}`);
+    if(v)   (` ➡️ Downloading: ${dependecy}`);
     const { data } = await axios.get(`${base_url}/${dependecy}/${await getVersion(dependecy, version)}`);
     const download_link = data["dist"]["tarball"];
     const name = data["name"];
@@ -86,24 +86,20 @@ const downloadAndunZip = async (link: string[], v: boolean) => {
   }
 };
 
+// fails many cases and is the source of error most of the time :((
 const getVersion = async (dependency: string, version: string): Promise<string> => {
   if (version.includes("*")) {
     const ver = await getLatestVersion(dependency);
     return ver[1];
   } else {
-    // doesn't handle ">= 2.1.2 < 3"
-    // let tr = version
-    // .replaceAll("~", "")
-    // .replaceAll("^", "")
-    // .replaceAll("*", "")
-    // .replaceAll(">", "")
-    // .replaceAll("=", "")
-    // .replaceAll("^", "")
-    // .replaceAll("<", "")
-    // .trim();
-    const pattern = /\b(\d+)\.(\d+)\.(\d+)\b/g;
-    const matches = version.match(pattern);
-    let tr = matches[0];
-    return tr;
+    if(version.split(".").length==3){
+      const pattern = /\b(\d+)\.(\d+)\.(\d+)\b/g;
+      const matches = version.match(pattern);
+      return matches[0];
+    } else {
+      // "~2" type
+      const ver = await getLatestVersion(dependency);
+      return ver[1];
+    }
   }
 };

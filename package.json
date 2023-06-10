@@ -1,6 +1,6 @@
 {
   "name": "chef-pm",
-  "version": "1.0.4",
+  "version": "1.0.5",
   "scripts": {
     "install": "npm install -g chef-pm",
     "build": "npm install && npx tsc",
@@ -19,7 +19,17 @@
     "url": "git+https://github.com/theSoberSobber/Chef.git"
   },
   "homepage": "https://theSoberSobber.github.io/Chef/",
-  "keywords": ["PackageManager", "Package", "Manager", "ChefPM", "Chef", "npm", "pnpm", "yarn", "minimal"],
+  "keywords": [
+    "PackageManager",
+    "Package",
+    "Manager",
+    "ChefPM",
+    "Chef",
+    "npm",
+    "pnpm",
+    "yarn",
+    "minimal"
+  ],
   "dependencies": {
     "@iarna/toml": "^2.2.5",
     "@types/decompress": "^4.2.4",
