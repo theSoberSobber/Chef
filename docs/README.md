@@ -1,4 +1,3 @@
-# Chef 👨‍🍳
 - Chef is a Beginner Friendly PM and offers a much smarter 🔎 and cuter 😳 approach to everything.
 - Chef is still well under development, and if you would like to contribute please see the issue tab.
 
