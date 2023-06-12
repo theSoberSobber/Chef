@@ -54,7 +54,7 @@ export const getNestedDep = async (dependecy: string, version: string): Promise<
 
 export const getTarballLinkAndName = async (dependecy: string, version: string, v: boolean) => {
   try {
-    if(v)   (` ➡️ Downloading: ${dependecy}`);
+    if(v) console.log(` ➡️ Downloading: ${dependecy}`);
     const { data } = await axios.get(`${base_url}/${dependecy}/${await getVersion(dependecy, version)}`);
     const download_link = data["dist"]["tarball"];
     const name = data["name"];
@@ -94,7 +94,7 @@ const getVersion = async (dependency: string, version: string): Promise<string> 
   } else {
     if(version.split(".").length==3){
       const pattern = /\b(\d+)\.(\d+)\.(\d+)\b/g;
-      const matches = version.match(pattern)!;
+      const matches = version.match(pattern);
       return matches[0];
     } else {
       const ver = await getLatestVersion(dependency);

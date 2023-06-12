@@ -9,6 +9,10 @@ https-proxy-agent = "7.0.0"
 safer-buffer = "2.1.2"
 mongoose = "7.2.2"
 axios = "1.4.0"
+"@types/node" = "20.3.0"
+yarn = "1.22.19"
+nodemon = "2.0.22"
+baileys = "6.0.9"
 
 [scripts]
 build = "node build.js"

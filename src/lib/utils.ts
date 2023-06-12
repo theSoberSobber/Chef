@@ -51,11 +51,12 @@ export const unZip = async (module_location: string, newWrite: string) => {
     .then((_files) => {
       //delete the tarball
       removeSync(module_location);
+      const item = newWrite.split("/")[newWrite.split("/").length-1];
       if(fs.existsSync(`${newWrite}/package`)) moveFolder(`${newWrite}/package`, newWrite);
+      else if(fs.existsSync(`${newWrite}/${item}`)) moveFolder(`${newWrite}/${item}`, newWrite);
       else {
-        const t = newWrite.split("/");
-        const item = t[t.length-1];
-        moveFolder(`${newWrite}/${item}`, newWrite);
+        let container: string[] = fs.readdirSync(`${newWrite}`);
+        moveFolder(`${newWrite}/${container[0]}`, newWrite);
       }
     })
     .catch((err) => {
