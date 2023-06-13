@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 import * as fs from "fs";
-import { JsonMap, parse, stringify } from "@iarna/toml";
+import { AnyJson, JsonMap, parse, stringify } from "@iarna/toml";
 import { parse as urlParser } from "url";
 import { basename } from "path";
 import * as decompress from "decompress";
@@ -132,3 +132,32 @@ export const deleteDep = async (payload: JsonMap, delete_item: string[]) => {
   }
   // console.log(payload, delete_item);
 };
+
+const colors = {
+  "dim": "\x1b[2m",
+  "underscore": "\x1b[4m",
+  "red": "\x1b[91m",
+  "green": "\x1b[92m",
+  "yellow": "\x1b[93m",
+  "bg-red": "\x1b[41m",
+  "bg-green": "\x1b[42m",
+  "bg-yellow": "\x1b[43m",
+  "reset": "\x1b[0m"
+};
+
+const map = ["red", "yellow", "green"];
+const bgMap = ["bg-red", "bg-yellow", "bg-green"];
+
+export const searchDataDisplay = async (data: any) => {
+  console.log(`🔪 <pName>: <popularity>, <confidence>\n`);
+  const len = Object.keys(data).length;
+  for(let i of data) if(i.score.detail.popularity*100>30 || len<=3){
+    const pConf = Math.floor(3*i.score.detail.popularity);
+    const fConf = Math.floor(3*i.score.final);
+    const conf = Math.floor((3*i.score.detail.popularity+3*i.score.final)/2);
+    console.log(`🍅 ${colors[map[conf]]}${i.package.name}${colors.reset} : ${colors[map[pConf]]}${Math.floor(i.score.detail.popularity*100)}%${colors.reset}, ${colors[map[fConf]]}${Math.floor(i.score.final*100)}%${colors.reset}
+  ➡️ ${i.package.description}
+  ➡️ ${colors.dim}${i.package.links.npm}${colors.reset}`);
+  }
+  console.log(``);
+}

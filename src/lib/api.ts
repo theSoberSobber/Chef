@@ -116,3 +116,24 @@ const getVersion = async (dependency: string, version: string): Promise<string> 
     }
   }
 };
+
+// help message
+export const helpMsg = `Welcome to Chef 😋
+chef <command> <options>
+
+Usage:
+
+chef init               initialize your project to work with chef!
+chef add                installs all dependencies mentioned in the given chef.toml
+ched add <foo>          add the <foo> dependency to your project (see --verbose for more)
+chef serve <foo>        run the script named <foo>
+chef recommend <desc>   context search! Recommend packages on basis of the given description keywords
+chef search <foo>       search package named similar to foo!
+chef taste <foo>        check if a package is dependency or direct conflict with the current packages
+chef remove <foo>       remove the <foo> dependency from your project
+chef help               displays this message
+
+<options>
+
+-h/--help          displays this message
+-v/--verbose       verbose install with intutive 😋 chef dependency list`;

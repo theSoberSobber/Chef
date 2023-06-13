@@ -5,20 +5,20 @@
 ---
 
 ## Usage
-- `chef init`
+- `chef init` : Implemented
   - Initializes your project to work with chef!
 - `chef add <pName>` : Implemented
   - add a package to your amazing recipe!
-- `chef taste <pName>`
-  - check if a package is dependency or direct conflict with the current packages
-- `chef recommend <description as String>`
+- `chef recommend <description as String>` : Implemented
   - context search! Recommend packages on basis of the given description keywords
 - `chef remove <pName>` : Implemented
   - uninstall a package
-- `chef search <pName>`
+- `chef search <pName>` : Implemented
   - search for a package name on the registry
 - `chef serve <scriptName>` : Implemented
   - runs a particular script specified in the chef.toml file
+- `chef taste <pName>`
+  - check if a package is dependency or direct conflict with the current packages
 
 ---
 
