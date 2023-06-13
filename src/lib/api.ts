@@ -17,6 +17,16 @@ export const getLatestVersion = async (dependecy: string): Promise<string[]> => 
     throw err;
   }
 };
+// get all available versions
+export const getAllVersions = async (dependecy: string): Promise<string[]> => {
+  try {
+    const { data } = await axios.get(`${base_url}/${dependecy}`);
+    let ver = []; for(let i in data["versions"]) ver.push(i);
+    return ver;
+  } catch (err) {
+    throw err;
+  }
+};
 
 //get dependecies and dev dependencies of packages in our toml config
 export const getImmedteDep = async (dependecy: string, version: string): Promise<{}> => {
@@ -92,10 +102,14 @@ const getVersion = async (dependency: string, version: string): Promise<string> 
     const ver = await getLatestVersion(dependency);
     return ver[1];
   } else {
+    const verArray = await getAllVersions(dependency);
     if(version.split(".").length==3){
-      const pattern = /\b(\d+)\.(\d+)\.(\d+)\b/g;
+      const pattern = /\b(\d+|x)\.(\d+|x)\.(\d+|x)\b/g;
       const matches = version.match(pattern);
-      return matches[0];
+      let validVersion = matches[0].replace(/x/g, '0');
+      let L="-1"; for(let i of verArray) if(i>validVersion){L=i; break;}
+      if(L=="-1") return verArray[verArray.length-1];
+      return L;
     } else {
       const ver = await getLatestVersion(dependency);
       return ver[1];

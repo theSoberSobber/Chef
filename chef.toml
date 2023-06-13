@@ -13,6 +13,7 @@ axios = "1.4.0"
 yarn = "1.22.19"
 nodemon = "2.0.22"
 baileys = "6.0.9"
+jai = "0.0.1"
 
 [scripts]
 build = "node build.js"
