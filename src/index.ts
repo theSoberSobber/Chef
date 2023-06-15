@@ -1,5 +1,5 @@
 #!/usr/bin/env node
-import {readFile, parseToml, execScript, stringifyObj, writeFile, deleteDep, log, searchDataDisplay} from "./lib/utils";
+import {readFile, parseToml, execScript, stringifyObj, writeFile, deleteDep, log, searchDataDisplay, writeJson} from "./lib/utils";
 import {getLatestVersion, getImmedteDep, getNestedDep, getTarballLinkAndName, helpMsg} from "./lib/api";
 import { JsonMap } from "@iarna/toml";
 import * as fs from "fs";
@@ -9,12 +9,16 @@ const base_url = "https://registry.npmjs.org";
 
 const main = async () => {
   try {
-    let obj: (JsonMap | undefined) = undefined;
-    if(fs.existsSync("./chef.toml")) obj = parseToml(await readFile("./chef.toml"));
-    let v: boolean = false; 
+    let obj, objJson: (JsonMap | undefined) = undefined;
+    if(fs.existsSync("./package.json")) objJson = JSON.parse(await readFile("./package.json"));
+    let v: boolean = false, dev:boolean = true;
     for(let i: number = 0; i<process.argv.length; i++){
       if(process.argv[i]=="--verbose" || process.argv[i]=="-v"){
         v=true;
+        process.argv.splice(i, 1);
+      }
+      if(process.argv[i]=="--no-dev" || process.argv[i]=="-n"){
+        dev=false;
         process.argv.splice(i, 1);
       }
       if(process.argv[i]=="--global" || process.argv[i]=="-g") return log(`🔪 Global Installs are currently not supported.`);
@@ -22,19 +26,30 @@ const main = async () => {
     if(process.argv.length===2) console.log(helpMsg);
     else if(process.argv[2] === "help") console.log(helpMsg);
     else if (process.argv[2] === "add") {
+      let objLock: (string | undefined | JsonMap) = undefined;
+      if(fs.existsSync("./chef.lock.toml")) objLock = await parseToml(await readFile("./chef.lock.toml"));
       if (process.argv.length == 3) {
-        if(obj!=undefined){
-          const dependency_list = obj["dependencies"] as object;
-          const dev_dependency_list = obj["devDependncies"] as object;
-          const all_dependencies = { ...dependency_list, ...dev_dependency_list };
-          install(all_dependencies, v);
-        } else return log(`🔪 No Valid chef.toml found, Exiting...`);
+        if(objJson!=undefined){
+          const dependency_list = objJson["dependencies"] as object;
+          const dev_dependency_list = objJson["devDependencies"] as object;
+          // add lock file check 
+          let all_dependencies : JsonMap = {};
+          for(let i in dependency_list){
+            i = i.toLowerCase();
+            if(objLock!=undefined && objLock[i]!=undefined) console.log(`😋 Requirement ${i} already satisfied. Skipping...`);
+            else all_dependencies[i]=(dependency_list as JsonMap)[i];
+          }
+          if(dev) for(let i in dev_dependency_list){
+            i = i.toLowerCase();
+            if(objLock!=undefined && objLock[i]!=undefined) console.log(`😋 Requirement ${i} already satisfied. Skipping...`);
+            else all_dependencies[i]=(dev_dependency_list as JsonMap)[i];
+          }
+          await install(all_dependencies, v);
+        } else return log(`🔪 No Valid package.json found, Exiting...`);
       } else {
         let cmd_map: JsonMap = {}, cmd_toml_map: JsonMap = {};
         const dependecy_list = process.argv.slice(3);
         const latest_list = [], tomlList = [];
-        let objLock: (string | undefined | JsonMap) = undefined;
-        if(fs.existsSync("./chef.lock.toml")) objLock = await parseToml(await readFile("./chef.lock.toml"));
         for (let i of dependecy_list){
           i=i.toLowerCase();
           if(objLock!=undefined && objLock[i]!=undefined) console.log(`😋 Requirement ${i} already satisfied. Skipping...`);
@@ -46,20 +61,23 @@ const main = async () => {
         for (let item of resolved_list) cmd_map[item[0]] = item[1];
         for (let item of resolved_toml_list) cmd_toml_map[item[0]] = item[1];
         await install(cmd_map, v);
-        if(obj!=undefined){
-          for (let dep in cmd_toml_map) (obj["dependencies"] as JsonMap)[dep] = cmd_toml_map[dep];
-          let toml_str = stringifyObj(obj);
-          await writeFile("./chef.toml", toml_str);
+        if(objJson!=undefined){
+          for (let dep in cmd_toml_map) (objJson["dependencies"] as JsonMap)[dep] = cmd_toml_map[dep];
+          await writeJson("./package.json", objJson);
         }
       }
     }else if (process.argv[2] === "serve") {
       if (process.argv.length < 4) {
-        console.error("Invalid serve arguments supplied.");
+        console.error("🔪 Invalid Serve Arguments passed.");
       } else {
-        if(obj===undefined) return log(`🔪 No Valid chef.toml found, Exiting...`);
-        const script = obj["scripts"] as JsonMap;
-        if(script[process.argv[3]]) execScript(process.argv[3], script[process.argv[3]] as string);
-        else console.log(`🗡️ Error! No such script found`);
+        if(objJson===undefined) return log(`🔪 No Valid package.json found, Exiting...`);
+        const script = objJson["scripts"] as JsonMap;
+        if(script[process.argv[3]]){
+          for(let i of (script[process.argv[3]] as string).split("&&")){
+            console.log(`\n➡️ ${process.argv[3]}`);
+            execScript(i);
+          }
+        } else console.log(`🗡️ Error! No such script found`);
       }
     } else if (process.argv[2] === "remove") {
       if (process.argv.length < 4) console.error("invalid remove arg supplied");
@@ -81,16 +99,18 @@ const main = async () => {
       data=data.objects;
       await searchDataDisplay(data);
     } else if (process.argv[2] === "init") {
-      if(fs.existsSync("./chef.toml")) console.log("🔪 Chef is already working on this project!");
+      if(fs.existsSync("./package.json")) console.log("🔪 Chef is already working on this project!");
       else {
-        await writeFile("./chef.toml", `[dependencies]\n\n[scripts]\n\n[devDependncies]`);
+        await writeFile("./package.json", `{\n\t"scripts": {},\n\t"dependencies": {},\n\t"devDependencies": {}\n}`);
         console.log(`🔪 Directory Initialized to work with Chef 😋`);
       }
     } else if(process.argv[2] === "taste"){
       console.log("🥝 Command not ready yet! Sorry, here's a cookie for the inconvineance caused 🍪🥹");
+      
     } else if(process.argv[2] != undefined) console.error("🥝 Invalid operation");
   } catch (error: any) {
-    if(error.response.status=="404") return log(`🔪 Package name not found on ${base_url}. (${error.response.status})`);
+    console.log(error);
+    if(error?.response?.status=="404") return log(`🔪 Package name not found on ${base_url}. (${error.response.status})`);
     else {
       error+='\n';
       if(fs.existsSync("./log.txt")) fs.appendFileSync("./log.txt", error);
@@ -101,9 +121,13 @@ const main = async () => {
 };
 
 const install = async (depenecyMap: JsonMap, v: boolean) => {
+  let objLock: (string | undefined | JsonMap) = undefined;
+  if(fs.existsSync("./chef.lock.toml")) objLock = await parseToml(await readFile("./chef.lock.toml"));
+  
   let dependecy_graph: JsonMap = {};
 
   for (let cli_dep in depenecyMap) {
+    if(objLock!=undefined && objLock[cli_dep]!=undefined) continue;
     if(v) console.log(`🍉 Resolving nested Dependencies for ${cli_dep}`);
 
     dependecy_graph[cli_dep] = {};
@@ -111,6 +135,7 @@ const install = async (depenecyMap: JsonMap, v: boolean) => {
 
     const immediteDep: JsonMap = await getImmedteDep(cli_dep, depenecyMap[cli_dep] as string);
     for (let immed_dep in immediteDep) {
+      if(objLock!=undefined && objLock[immed_dep]!=undefined) continue;
       if(v) console.log(` ➡️ immediate dependency: ${immed_dep}`);
       (dependecy_graph[cli_dep] as JsonMap)[immed_dep] = immediteDep[immed_dep];
       const nestedDep: JsonMap = await getNestedDep(immed_dep, immediteDep[immed_dep] as string);

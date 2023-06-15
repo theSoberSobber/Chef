@@ -17,6 +17,15 @@ export const readFile = (path: string): Promise<string> => {
   });
 };
 
+export const writeJson = async (path: string, obj:AnyJson): Promise<boolean> => {
+  return new Promise(async (res, rej) => {
+    let package_json_str = JSON.stringify(obj, null, 4);
+    // figure out a method to write beautified json
+    await writeFile("./package.json", package_json_str);
+    res(true); 
+  });
+}
+
 export const writeFile = (path: string, content: string) => {
   return new Promise((res, rej) => {
     fs.writeFile(path, content, (err) => {
@@ -76,8 +85,7 @@ const moveFolder = (src: string, des: string): void => {
   }
 };
 
-export const execScript = (name:string, command: string): void => {
-  console.log(`\n➡️ ${name}`);
+export const execScript = (command: string): void => {
   console.log(`➡️ ${command}\n`);
   //parse the commad
   let cmd = command.split(" ");
@@ -93,6 +101,11 @@ export const execScript = (name:string, command: string): void => {
   child.stderr.on("data", (data) => {
     console.log(`🔪 Child Process Error: `);
     console.log(data);
+    console.log(`🔪 This is not an error with Chef rather than with the child process.\n`);
+  });
+  child.on("error", (error) => {
+    console.log(`🔪 Error in spawning Child Process: `);
+    console.log(error);
     console.log(`🔪 This is not an error with Chef rather than with the child process.\n`);
   });
   child.on("close", (code) => {
@@ -119,18 +132,16 @@ export const deleteDep = async (payload: JsonMap, delete_item: string[]) => {
         removeSync(`./${dir_name}/${item}`);
         console.log(`🗡️ Deleted ${item}`);
       }
-      //update config file
-      if(fs.existsSync("./chef.toml")){
-        const toml_data = await readFile("./chef.toml");
-        const obj = parseToml(toml_data);
+      //update package.json
+      if(fs.existsSync("./package.json")){
+        const json_data = await readFile("./package.json");
+        const obj = JSON.parse(json_data);
         if ((obj["dependencies"] as JsonMap)[item]) {
           delete (obj["dependencies"] as JsonMap)[item];
         } else {
-          delete (obj["devDependncies"] as JsonMap)[item];
+          delete (obj["devDependencies"] as JsonMap)[item];
         }
-
-        let toml_config_str = stringifyObj(obj);
-        writeFile("./chef.toml", toml_config_str); 
+        await writeJson("./package.json", obj);
       }
       //update the lock file
       let toml_str = stringifyObj(payload);

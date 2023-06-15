@@ -136,4 +136,5 @@ chef help               displays this message
 <options>
 
 -h/--help          displays this message
+-n/--no-dev
 -v/--verbose       verbose install with intutive 😋 chef dependency list`;
