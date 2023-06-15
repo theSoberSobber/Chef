@@ -16,7 +16,7 @@
 - `chef search <pName>` : Implemented
   - search for a package name on the registry
 - `chef serve <scriptName>` : Implemented
-  - runs a particular script specified in the chef.toml file
+  - runs a particular script specified in the package.json file
 - `chef taste <pName>`
   - check if a package is dependency or direct conflict with the current packages
 

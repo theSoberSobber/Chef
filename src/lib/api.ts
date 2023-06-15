@@ -124,7 +124,7 @@ chef <command> <options>
 Usage:
 
 chef init               initialize your project to work with chef!
-chef add                installs all dependencies mentioned in the given chef.toml
+chef add                installs all dependencies mentioned in the given package.json
 ched add <foo>          add the <foo> dependency to your project (see --verbose for more)
 chef serve <foo>        run the script named <foo>
 chef recommend <desc>   context search! Recommend packages on basis of the given description keywords
