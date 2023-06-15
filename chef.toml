@@ -18,7 +18,7 @@ jai = "0.0.1"
 [scripts]
 build = "node build.js"
 test = "node test.js"
-start = "ts-node index.ts i"
+start = "node ./build/index.js"
 
 [devDependncies]
 typescript = "4.6.4"

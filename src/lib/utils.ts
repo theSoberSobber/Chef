@@ -76,17 +76,24 @@ const moveFolder = (src: string, des: string): void => {
   }
 };
 
-export const execScript = (command: string): void => {
+export const execScript = (name:string, command: string): void => {
+  console.log(`\n➡️ ${name}`);
+  console.log(`➡️ ${command}\n`);
   //parse the commad
   let cmd = command.split(" ");
   const child = spawn(cmd[0], cmd.slice(1));
   let ScriptOutput = "";
-
   child.stdout.setEncoding("utf8");
   child.stdout.on("data", (data) => {
     console.log(data);
     data = data.toString();
     ScriptOutput += data;
+  });
+  child.stderr.setEncoding("utf8");
+  child.stderr.on("data", (data) => {
+    console.log(`🔪 Child Process Error: `);
+    console.log(data);
+    console.log(`🔪 This is not an error with Chef rather than with the child process.\n`);
   });
   child.on("close", (code) => {
     if (code !== 0) {

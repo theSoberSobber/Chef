@@ -58,7 +58,7 @@ const main = async () => {
       } else {
         if(obj===undefined) return log(`🔪 No Valid chef.toml found, Exiting...`);
         const script = obj["scripts"] as JsonMap;
-        if(script[process.argv[3]]) execScript(script[process.argv[3]] as string);
+        if(script[process.argv[3]]) execScript(process.argv[3], script[process.argv[3]] as string);
         else console.log(`🗡️ Error! No such script found`);
       }
     } else if (process.argv[2] === "remove") {
