@@ -1,5 +1,20 @@
-- Chef is a Beginner Friendly PM and offers a much smarter 🔎 and cuter 😳 approach to everything.
+# Chef 👨‍🍳
+- Chef is a Beginner Friendly Package Manager and offers a much smarter 🔎 and cuter 😳 approach to everything.
 - Chef is still well under development, and if you would like to contribute please see the issue tab.
+
+- ![recommend-chef](./assets/recommed-chef.jpg)
+
+---
+
+## Installation
+- To install the chef package manager (chef-pm), use the following command:
+  - `npm install -g chef-pm`
+  - note the -g flag, it is for globally installing chef, so that he never leaves your side! 😋
+  - note that this installs from the [npm registry](https://www.npmjs.com/package/chef-pm).
+- iwr/curl
+  - not available yet
+- Manual install
+  - Please see the [build](#build) section.
 
 ---
 
@@ -21,14 +36,10 @@
 
 ---
 
-## Installation
-- To install the chef package manager (chef-pm), use the following command:
-  - `npm install -g chef-pm`
-  - note the -g flag, it is for globally installing chef, so that he never leaves your side! 😋
-- iwr/curl
-  - not available yet
-- Manual install
-  - Please see the [build](#build) section.
+## Showcase
+
+![help-chef](./assets/help-chef.png) <br/>
+![search-chef](./assets/search-chef.jpg)
 
 ---
 
